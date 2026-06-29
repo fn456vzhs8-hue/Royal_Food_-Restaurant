@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Grand Bistro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #c5a880; /* Elegant Gold/Bronze */
+            --secondary-color: #1a1a1a; /* Charcoal Dark */
+            --bg-light: #f9f9f9;
+            --text-dark: #222222;
+            --text-muted: #666666;
+            --white: #ffffff;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header & Info Button */
+        header {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-color);
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .info-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .info-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        /* Info Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        /* Main Layout Grid */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Menu Grid */
+        .menu-title {
+            font-size: 1.75rem;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+            text-transform: uppercase;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            border: 1px solid #eee;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .item-details h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+        }
+
+        .item-details p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .item-price-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .price {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        /* Sidebar / Cart & Customer Panel */
+        .sidebar {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+            border: 1px solid #eee;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            color: var(--secondary-color);
+        }
+
+        /* Cart UI */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            background: #eee;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .qty-btn:hover {
+            background: var(--primary-color);
+        }
+
+        .cart-empty {
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            color: var(--secondary-color);
+        }
+
+        /* Customer Options Form */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Checkout Action Button */
+        .checkout-btn {
+            width: 100%;
+            background-color: #25D366; /* WhatsApp Green */
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-btn:hover {
+            background-color: #128C7E;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: #888;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 60px;
+            border-top: 3px solid var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="info-btn" onclick="toggleModal(true)">i</button>
+        <h1>The Grand Bistro</h1>
+        <p>Premium Culinary Experience Delivered To Your Doorstep</p>
+    </header>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+            <h3>Restaurant Info</h3>
+            <p style="margin-bottom: 10px;"><strong>Developer & Owner:</strong> Mohammed Ismail</p>
+            <p style="margin-bottom: 10px;"><strong>Affiliation:</strong> NSAKCET</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Providing high-quality gourmet services and authentic tastes since establishment.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <main>
+            <h2 class="menu-title">Our Gourmet Menu</h2>
+            <div class="menu-grid" id="menu-container">
+                </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>Your Order</h3>
+                <div id="cart-items-container">
+                    <p class="cart-empty">Your cart is empty.</p>
+                </div>
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">₹0.00</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Customer Options</h3>
+                <form id="orderForm" onsubmit="handleCheckout(event)">
+                    <div class="form-group">
+                        <label for="custName">Full Name *</label>
+                        <input type="text" id="custName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="custPhone">Contact Number *</label>
+                        <input type="tel" id="custPhone" required placeholder="9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label for="custAddress">Delivery Address *</label>
+                        <textarea id="custAddress" rows="3" required placeholder="House No, Street, Landmark..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="checkout-btn">
+                        Proceed to WhatsApp Checkout
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Mohammed Ismail. All rights reserved NSAKCET</p>
+    </footer>
+
+    <script>
+        // Array containing exactly 15 specified items
+        const menuItems = [
+            { id: 1, name: "Hyderabadi Chicken Biryani", price: 280, desc: "Authentic slow-cooked fragrant basmati rice with spiced chicken." },
+            { id: 2, name: "Crispy Fried Chicken", price: 240, desc: "Golden brown, crunchy skin tender seasoned chicken pieces." },
+            { id: 3, name: "Classic Chicken Shawarma", price: 120, desc: "Flay-grilled spiced chicken wrapped in soft rumali bread with garlic mayo." },
+            { id: 4, name: "Peri Peri French Fries", price: 90, desc: "Crispy cut potatoes tossed in spicy african peri-peri seasoning." },
+            { id: 5, name: "Loaded Chicken Pizza", price: 320, desc: "Fresh crust loaded with shredded chicken, peppers, onions, and mozzarella." },
+            { id: 6, name: "Butter Chicken Masala", price: 260, desc: "Tender tandoori chicken cooked in a rich, creamy tomato gravy." },
+            { id: 7, name: "Garlic Naan", price: 40, desc: "Leavened clay-oven flatbread garnished with minced garlic and butter." },
+            { id: 8, name: "Mutton Seekh Kebab", price: 300, desc: "Minced spiced mutton skewered and grilled over charcoal embers." },
+            { id: 9, name: "Cheesy French Fries", price: 110, desc: "Classic golden fries smothered in warm liquid cheddar cheese." },
+            { id: 10, name: "Margherita Pizza", price: 220, desc: "Simple elegance with authentic tomato sauce, basil, and cheese." },
+            { id: 11, name: "Spiced Chicken Burger", price: 150, desc: "Crispy chicken patty topped with crisp lettuce and signature sauce." },
+            { id: 12, name: "Rumali Shawarma Plate", price: 180, desc: "Deconstructed shawarma served with extra meat, salad, and kuboos." },
+            { id: 13, name: "Paneer Butter Masala", price: 210, desc: "Soft cottage cheese cubes cooked in traditional rich orange gravy." },
+            { id: 14, name: "Veg Double Cheese Pizza", price: 280, desc: "Diced garden fresh vegetables topped with an extra layer of cheese." },
+            { id: 15, name: "Mint Mojito", price: 90, desc: "Refreshing cold beverage prepared with fresh mint leaves, lime, and soda." }
+        ];
+
+        let cart = {};
+
+        // Render the 15 items professionally on grid
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = menuItems.map(item => `
+                <div class="menu-item">
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p>${item.desc}</p>
+                    </div>
+                    <div class="item-price-action">
+                        <span class="price">₹${item.price}</span>
+                        <button class="add-to-cart-btn" onclick="addToCart(${item.id})">Add Item</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add Option logic
+        function addToCart(id) {
+            if (cart[id]) {
+                cart[id].qty += 1;
+            } else {
+                const item = menuItems.find(p => p.id === id);
+                cart[id] = { ...item, qty: 1 };
+            }
+            updateCartUI();
+        }
+
+        // Modify Quantity / Remove Option logic
+        function changeQty(id, change) {
+            if (!cart[id]) return;
+            cart[id].qty += change;
+            if (cart[id].qty <= 0) {
+                delete cart[id];
+            }
+            updateCartUI();
+        }
+
+        // Keep cart representation aligned with state data
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const totalSpan = document.getElementById('cart-total-price');
+            const keys = Object.keys(cart);
+
+            if (keys.length === 0) {
+                container.innerHTML = `<p class="cart-empty">Your cart is empty.</p>`;
+                totalSpan.innerText = '₹0.00';
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+
+            keys.forEach(id => {
+                const item = cart[id];
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <div><strong>${item.name}</strong></div>
+                            <div class="text-muted">₹${item.price} x ${item.qty}</div>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn" onclick="changeQty(${id}, -1)">-</button>
+                            <span>${item.qty}</span>
+                            <button class="qty-btn" onclick="changeQty(${id}, 1)">+</button>
+                            <span style="margin-left:5px; font-weight:600;">₹${itemTotal}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            totalSpan.innerText = `₹${total.toFixed(2)}`;
+        }
+
+        // Info Modal Open/Close Controls
+        function toggleModal(show) {
+            document.getElementById('infoModal').style.display = show ? 'flex' : 'none';
+        }
+
+        // Handle Form Submit and Route Order details to designated WhatsApp
+        function handleCheckout(event) {
+            event.preventDefault();
+            
+            const cartKeys = Object.keys(cart);
+            if (cartKeys.length === 0) {
+                alert('Your cart is empty! Please add items before checking out.');
+                return;
+            }
+
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
+
+            // Generate beautifully structured WhatsApp text output string
+            let message = `*--- NEW ORDER DETAILED RECEIPT ---*\n\n`;
+            message += `*Customer Profile Details:*\n`;
+            message += `• *Name:* ${name}\n`;
+            message += `• *Contact Phone:* ${phone}\n`;
+            message += `• *Delivery Location:* ${address}\n\n`;
+            message += `*Selected Ordered Items:*\n`;
+
+            let grandTotal = 0;
+            cartKeys.forEach(id => {
+                const item = cart[id];
+                const cost = item.price * item.qty;
+                grandTotal += cost;
+                message += `▪️ ${item.name} x ${item.qty} -> *₹${cost}*\n`;
+            });
+
+            message += `\n*Grand Total Payable Balance:* ₹${grandTotal.toFixed(2)}\n\n`;
+            message += `_All rights reserved NSAKCET_`;
+
+            // Encoding string characters cleanly for standard URL delivery format
+            const targetWhatsAppNumber = "919121983328"; // Formatted with international country code
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${targetWhatsAppNumber}?text=${encodedMessage}`;
+
+            // Open window tab direction targeting the message endpoint directly
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Initial launch logic
+        window.onclick = function(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                toggleModal(false);
+            }
+        }
+        renderMenu();
+    </script>
+</body>
+</html>
